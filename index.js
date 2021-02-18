@@ -45,6 +45,8 @@ app.get('/', requireAuth, function(req, res) {
 app.post('/signin', requireSignin, Authentication.signin);
 app.post('/signup', Authentication.signup);
 
+require("./routes/main")(app);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT);
