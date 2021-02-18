@@ -36,6 +36,9 @@ const passportService = require('./services/passport');
 const requireAuth = passport.authenticate('jwt', { session: false });
 const requireSignin = passport.authenticate('local', { session: false });
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.get('/', requireAuth, function(req, res) {
   res.send({ message: 'Super secret code is ABC123' });
 });
