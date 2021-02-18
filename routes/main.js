@@ -6,7 +6,7 @@ module.exports = app => {
         "/user_details",
         requireAuth,
 		(req, res) => {
-			console.log(req.user, res.user)
+            res.send(req.user)
 		}
 	);
 };
