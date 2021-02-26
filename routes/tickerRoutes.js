@@ -89,6 +89,22 @@ module.exports = app => {
 	});
 
 	// ===========================================================================
+
+	app.post("/tickers/validate_symbol", async (req, res) => {
+		const { symbol } = req.body;
+		Ticker.findOne(
+			{
+				"metadata.symbol": {
+					$regex: new RegExp(symbol),
+					$options: "i"
+				}
+			},
+			async (err, result) => {
+				if (!_.isEmpty(result)) return res.status(500).send("Already exists");
+				res.json({ status: "ok" });
+			}
+		);
+	});
 };
 
 const buildQuery = criteria => {
