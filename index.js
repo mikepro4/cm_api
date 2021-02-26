@@ -45,7 +45,11 @@ app.get('/', requireAuth, function(req, res) {
 app.post('/signin', requireSignin, Authentication.signin);
 app.post('/signup', Authentication.signup);
 
+require("./models/Ticker");
+
 require("./routes/main")(app);
+require("./routes/tickerRoutes")(app);
+
 
 
 const PORT = process.env.PORT || 5000;
