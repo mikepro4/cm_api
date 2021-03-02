@@ -48,10 +48,12 @@ app.post('/signup', Authentication.signup);
 
 require("./models/Ticker");
 require("./models/Proxy");
+require("./models/Video");
 
 require("./routes/main")(app);
 require("./routes/tickerRoutes")(app);
 require("./routes/proxyRoutes")(app);
+require("./routes/videoRoutes")(app);
 
 require("./cron/scraping")(app);
 

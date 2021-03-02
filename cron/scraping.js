@@ -1,18 +1,58 @@
 var CronJob = require('cron').CronJob;
-
+const _ = require("lodash");
 const mongoose = require("mongoose");
 const request = require('request-promise');
 
 const YoutubeSearch = require("./scrape_yt_search");
+
+const Video = mongoose.model("videos");
+
+function checkVideo(video, ticker) {
+    return new Promise(async (resolve, reject) => {
+
+        try {
+            const shouldAddVideo = Video.findOne(
+                {
+                    googleId: { $eq: video.id }
+                },
+                async(err, result) => {
+                    if(!result) {
+                        console.log("add video")
+
+                        const newVideo = await new Video({
+                            createdAt: new Date(),
+                            ticker: ticker,
+                            googleId: video.id,
+                            metadata: video,
+                        }).save();
+
+                        if(newVideo) {
+                            resolve(video)
+                        }
+                    } else {
+                        console.log("reject video")
+                    }
+                }
+            );
+
+
+        } catch (e) {
+            reject(e);
+        }
+        
+    })
+}
 
 module.exports = app => {
     var job = new CronJob(
         '*/2 * * * * *',
         function() {
 
-            YoutubeSearch.search('AQB', {sp : "CAI%253D"}).then(results => {
+            const ticker = "AQB"
+
+            YoutubeSearch.search(ticker, {sp : "CAI%253D"}).then(results => {
                 results.videos.map((result) => {
-                    return console.log(result)
+                    return checkVideo(result, ticker)
                 })
             }).catch((err) => console.log(err));
 
