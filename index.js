@@ -9,6 +9,7 @@ const fileUpload = require("express-fileupload")
 const PUBLIC_DIR = "public";
 const STATIC_DIR = "static";
 
+
 mongoose.Promise = global.Promise;
 const options = {
 	 useNewUrlParser: true
@@ -52,7 +53,7 @@ require("./routes/main")(app);
 require("./routes/tickerRoutes")(app);
 require("./routes/proxyRoutes")(app);
 
-
+require("./cron/scraping")(app);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT);
