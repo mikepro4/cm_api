@@ -1,12 +1,12 @@
 const _ = require("lodash");
 const mongoose = require("mongoose");
-const Ticker = mongoose.model("tickers");
+const Proxy = mongoose.model("proxies");
 
 module.exports = app => {
 
 	// ===========================================================================
 
-	app.post("/tickers/search", async (req, res) => {
+	app.post("/proxies/search", async (req, res) => {
 		const { criteria, sortProperty, offset, limit, order } = req.body;
 		let adjustSortProperty 
 		if (sortProperty == "createdAt") {
@@ -14,13 +14,13 @@ module.exports = app => {
 		} else {
 			adjustSortProperty = "metadata." + sortProperty
 		}
-		const query = Ticker.find(buildQuery(criteria))
+		const query = Proxy.find(buildQuery(criteria))
 			.sort({ [adjustSortProperty]: order })
 			.skip(offset)
 			.limit(limit);
 
 		return Promise.all(
-			[query, Ticker.find(buildQuery(criteria)).countDocuments()]
+			[query, Proxy.find(buildQuery(criteria)).countDocuments()]
 		).then(
 			results => {
 				return res.json({
@@ -35,30 +35,30 @@ module.exports = app => {
 
 	// ===========================================================================
 
-	app.post("/tickers/create", async (req, res) => {
-		const ticker = await new Ticker({
+	app.post("/proxies/create", async (req, res) => {
+		const proxy = await new Proxy({
 			createdAt: new Date(),
 			metadata: req.body.metadata,
 		}).save();
-		res.json(ticker);
+		res.json(proxy);
 	});
 
 	// ===========================================================================
 
-	app.post("/tickers/update", async (req, res) => {
-		Ticker.update(
+	app.post("/proxies/update", async (req, res) => {
+		Proxy.update(
 			{
-				_id: req.body.tickerId
+				_id: req.body.proxyId
 			},
 			{
-				$set: { metadata: req.body.newTicker }
+				$set: { metadata: req.body.newProxy }
 			},
 			async (err, info) => {
 				if (err) res.status(400).send({ error: "true", error: err });
 				if (info) {
-					Ticker.findOne({ _id: req.body.tickerId }, async (err, ticker) => {
-						if (ticker) {
-							res.json({ success: "true", info: info, ticker: ticker });
+					Proxy.findOne({ _id: req.body.proxyId }, async (err, proxy) => {
+						if (proxy) {
+							res.json({ success: "true", info: info, proxy: proxy });
 						}
 					});
 				}
@@ -68,33 +68,33 @@ module.exports = app => {
 
 	// ===========================================================================
 
-	app.post("/tickers/delete", async (req, res) => {
-		Ticker.remove({ _id: req.body.tickerId }, async (err) => {
+	app.post("/proxies/delete", async (req, res) => {
+		Proxy.remove({ _id: req.body.proxyId }, async (err) => {
 			if (err) return res.send(err);
 			res.json({
 				success: "true",
-				message: "deleted ticker"
+				message: "deleted proxy"
 			});
 		});
 	});
 
 	// ===========================================================================
 
-	app.post("/tickers/details", async (req, res) => {
-		Ticker.findOne({ _id: req.body.tickerId }, async (err, ticker) => {
-			if (ticker) {
-				res.json(ticker);
+	app.post("/proxies/details", async (req, res) => {
+		Proxy.findOne({ _id: req.body.proxyId }, async (err, proxy) => {
+			if (proxy) {
+				res.json(proxy);
 			}
 		});
 	});
 
 	// ===========================================================================
 
-	app.post("/tickers/validate_symbol", async (req, res) => {
-		const { symbol } = req.body;
-		Ticker.findOne(
+	app.post("/proxies/validate_ip", async (req, res) => {
+		const { ip } = req.body;
+		Proxy.findOne(
 			{
-				"metadata.symbol": { $eq: symbol }
+				"metadata.ip": { $eq: ip }
 			},
 			async (err, result) => {
 				if (!_.isEmpty(result)) return res.status(500).send("Already exists");
@@ -107,19 +107,19 @@ module.exports = app => {
 const buildQuery = criteria => {
 	const query = {};
 
-	if (criteria.symbol) {
+	if (criteria.ip) {
 		_.assign(query, {
-			"metadata.symbol": {
-				$regex: new RegExp(criteria.symbol),
+			"metadata.ip": {
+				$regex: new RegExp(criteria.ip),
 				$options: "i"
 			}
 		});
 	}
 
-	if (criteria.name) {
+	if (criteria.port) {
 		_.assign(query, {
-			"metadata.name": {
-				$regex: new RegExp(criteria.name),
+			"metadata.port": {
+				$regex: new RegExp(criteria.port),
 				$options: "i"
 			}
 		});
