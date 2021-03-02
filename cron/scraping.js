@@ -1,16 +1,7 @@
 var CronJob = require('cron').CronJob;
 
 const mongoose = require("mongoose");
-const Proxy = mongoose.model("proxies");
-const axios = require('axios');
-
-let cheerio = require('cheerio');
-let fs = require('fs'); 
-
 const request = require('request-promise');
-
-
-const youtube = require("scrape-youtube").default;
 
 const YoutubeSearch = require("./scrape_yt_search");
 
@@ -18,6 +9,12 @@ module.exports = app => {
     var job = new CronJob(
         '*/2 * * * * *',
         function() {
+
+            YoutubeSearch.search('AQB', {sp : "CAI%253D"}).then(results => {
+                results.videos.map((result) => {
+                    return console.log(result)
+                })
+            }).catch((err) => console.log(err));
 
             
             // Proxy.aggregate([{ $sample: { size: 1 } }]).then(random => {
@@ -52,12 +49,6 @@ module.exports = app => {
             //     console.log(results); 
             // }).catch((err) => console.log(err));
 
-            YoutubeSearch.search('AQB').then(results => {
-                results.videos.map((result) => {
-                    return console.log(result.title)
-                })
-            }).catch((err) => console.log(err));
-            
 
             // request({
             //         url: 'https://www.youtube.com/results?search_query=pltr',

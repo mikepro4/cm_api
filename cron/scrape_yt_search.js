@@ -1,4 +1,5 @@
 const request = require('request-promise');
+const keys = require("./../config/keys");
 
 const { getStreamData, getPlaylistData, getVideoData } = require('./parser_yt_search');
 
@@ -127,7 +128,7 @@ function load(query, options) {
     return new Promise((resolve, reject) => {
         request({
             url: url,
-            proxy: 'http://user-cashmachine:Octatrack2$@gate.smartproxy.com:7000',
+            proxy: keys.SP,
             headers: {
                 'User-Agent': 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Safari/537.36.'
             }
