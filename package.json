@@ -18,6 +18,7 @@
 		"axios": "^0.21.1",
 		"bcrypt-nodejs": "0.0.3",
 		"body-parser": "^1.18.3",
+		"cheerio": "^1.0.0-rc.5",
 		"cloudinary": "^1.13.2",
 		"cookie-session": "^2.0.0-beta.2",
 		"cors": "^2.8.5",
@@ -44,6 +45,8 @@
 		"passport-jwt": "^2.0.0",
 		"passport-local": "^1.0.0",
 		"qs": "^6.6.0",
+		"request": "^2.88.2",
+		"request-promise": "^4.2.6",
 		"scrape-youtube": "^2.1.3"
 	}
 }
