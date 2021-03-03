@@ -26,7 +26,11 @@ function checkVideo(video, ticker) {
 
                         const newVideo = await new Video({
                             createdAt: new Date(),
-                            ticker: ticker,
+                            linkedTickers: [
+                                {
+                                    symbol: ticker
+                                }
+                            ],
                             googleId: video.id,
                             metadata: video,
                         }).save();
@@ -35,7 +39,12 @@ function checkVideo(video, ticker) {
                             resolve(video)
                         }
                     } else {
-                        console.log("reject video")
+                        let linked = _.includes(result.linkedTickers, { symbol: ticker})
+                        if (linked) {
+                            console.log("update video")
+                        } else {
+                            console.log("reject video")
+                        }
                     }
                 }
             );
@@ -229,7 +238,7 @@ module.exports = app => {
     );
 
     job.start()
-    loadFirstTicker()
+    // loadFirstTicker()
 
 }
 

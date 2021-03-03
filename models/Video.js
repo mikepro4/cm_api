@@ -3,7 +3,11 @@ const { Schema } = mongoose;
 
 const videoSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
-    ticker: String,
+    linkedTickers: [
+		{
+			symbol: String
+		}
+	],
     googleId: String,
     metadata: {
         id: String,
