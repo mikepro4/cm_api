@@ -5,7 +5,11 @@ const scrapingSchema = new Schema({
     scrapingRunning:  {type: Boolean, default: true},
     delayNextTicker: {type: Number, default: 1000},
     delayStartOver: {type: Number, default: 10000},
-    type: String
+    cycleStart: Number,
+    cycleEnd: Number,
+    cycleDuration: Number,
+    scrapingPaused: Boolean,
+    scrapingPausedTicker: String
 });
 
 

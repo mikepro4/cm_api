@@ -9,12 +9,16 @@ const fileUpload = require("express-fileupload")
 const PUBLIC_DIR = "public";
 const STATIC_DIR = "static";
 
-
 mongoose.Promise = global.Promise;
 const options = {
 	 useNewUrlParser: true
  }
-mongoose.connect(keys.mongoURI, options);
+mongoose.connect(keys.mongoURI, options,
+    function(err){
+        if(err){
+            throw err
+        }
+});
 
 const app = express();
 app.use(bodyParser.json({limit: '50mb'}));
@@ -61,3 +65,4 @@ require("./cron/scraping");
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT);
+

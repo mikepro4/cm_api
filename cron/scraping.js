@@ -12,11 +12,23 @@ let currentVideo = 0
 let videoCount = 0
 let running = true
 
+const io = require('socket.io')(3100, {
+	cors: {
+	  origin: '*',
+	}
+})
+
+io.on('connection',(socket)=>{
+    socket.emit('rejectvideo',(data)=>{     
+        return('reject from socket')
+    })
+})
+
 function checkVideo(video, ticker) {
     return new Promise(async (resolve, reject) => {
 
         try {
-            const shouldAddVideo = Video.findOne(
+            Video.findOne(
                 {
                     googleId: { $eq: video.id }
                 },
@@ -36,6 +48,11 @@ function checkVideo(video, ticker) {
                         }).save();
 
                         if(newVideo) {
+                            io.emit('videoupdate',{
+                                status: "add",
+                                ticker: ticker,
+                                video: newVideo
+                            })
                             resolve(video)
                         }
                     } else {
@@ -65,6 +82,11 @@ function checkVideo(video, ticker) {
                                         Video.findOne({ _id: result._id }, async (err, video) => {
                                             if (video) {
                                                 // console.log("update video")
+                                                io.emit('videoupdate',{
+                                                    status: "update",
+                                                    ticker: ticker,
+                                                    video: video
+                                                })
                                                 resolve(video)
                                             }
                                         });
@@ -73,6 +95,13 @@ function checkVideo(video, ticker) {
                             );
                         } else {
                             // console.log("reject video")
+
+                            io.emit('videoupdate', {
+                                status: "reject",
+                                ticker: ticker,
+                                video: result
+                            })
+                            
                         }
                     }
                 }
@@ -89,12 +118,6 @@ function checkVideo(video, ticker) {
 function searchVideos(ticker) {
     return Proxy.aggregate([{ $sample: { size: 1 } }]).then(random => {
 
-        // const options = {
-        //     requestOptions: {
-        //         host: results[0].metadata.ip,
-        //         port: parseInt(results[0].metadata.port)
-        //     }
-        // };
 
         let proxy = random[0].metadata.ip
 
@@ -275,6 +298,6 @@ var job = new CronJob(
 );
 
 job.start()
-loadFirstTicker()
-
-
+if(running) {
+    loadFirstTicker()
+}
