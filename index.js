@@ -49,6 +49,7 @@ app.post('/signup', Authentication.signup);
 require("./models/Ticker");
 require("./models/Proxy");
 require("./models/Video");
+require("./models/Scraping");
 
 require("./routes/main")(app);
 require("./routes/tickerRoutes")(app);
