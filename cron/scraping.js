@@ -14,7 +14,7 @@ let running = false
 
 const io = require('socket.io')(3100, {
 	cors: {
-	  origin: '*',
+	  origin: 'https://cashmachine.herokuapp.com/',
 	}
 })
 
