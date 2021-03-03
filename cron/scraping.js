@@ -10,7 +10,7 @@ const Proxy = mongoose.model("proxies");
 
 let currentVideo = 0
 let videoCount = 0
-let running = true
+let running = false
 
 const io = require('socket.io')(3100, {
 	cors: {
