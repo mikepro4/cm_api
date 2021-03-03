@@ -2,6 +2,9 @@ const request = require('request-promise');
 const keys = require("./../config/keys");
 
 const { getStreamData, getPlaylistData, getVideoData } = require('./parser_yt_search');
+const mongoose = require("mongoose");
+
+const Proxy = mongoose.model("proxies");
 
 function test(user) {
     return "testing"
@@ -121,20 +124,25 @@ function parseData(data)  {
      * @param query Search query
      * @param options Search options
      */
-function load(query, options) {
+function load(query, options, proxy) {
     const url = getURL(query, options);
 
-
+    console.log(proxy)
     return new Promise((resolve, reject) => {
         request({
             url: url,
-            proxy: keys.SP,
+            proxy: "http://" + proxy,
             headers: {
                 'User-Agent': 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Safari/537.36.'
             }
         })
         .then((response) => {resolve(response)})
-        .catch(console.error);
+        .catch((err) => {
+            Proxy.remove({ "metadata.ip": proxy }, async (err) => {
+                if (err) return res.send(err);
+                reject("deleted proxy")
+            });
+        })
     });
 
 
@@ -145,11 +153,11 @@ function getDebugID() {
 }
   
 
-exports.search = function(query, options) {
+exports.search = function(query, options, proxy) {
     return new Promise(async (resolve, reject) => {
         try {
             options = { ...options, _debugid: getDebugID() };
-            const page = await load(query, options);
+            const page = await load(query, options, proxy);
             const data = await extractRenderData(page);
             const results = await parseData(data);
 

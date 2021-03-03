@@ -6,6 +6,11 @@ const request = require('request-promise');
 const YoutubeSearch = require("./scrape_yt_search");
 
 const Video = mongoose.model("videos");
+const Ticker = mongoose.model("tickers");
+const Proxy = mongoose.model("proxies");
+
+let currentVideo = 0
+let videoCount = 0
 
 function checkVideo(video, ticker) {
     return new Promise(async (resolve, reject) => {
@@ -43,18 +48,116 @@ function checkVideo(video, ticker) {
     })
 }
 
+function searchVideos(ticker) {
+    return Proxy.aggregate([{ $sample: { size: 1 } }]).then(random => {
+
+        // const options = {
+        //     requestOptions: {
+        //         host: results[0].metadata.ip,
+        //         port: parseInt(results[0].metadata.port)
+        //     }
+        // };
+
+        let proxy = random[0].metadata.ip
+
+        YoutubeSearch.search(
+                ticker, 
+                {sp: "CAISBAgCEAE%253D"},
+                proxy
+            )
+            .then(results => {
+            results.videos.map((result) => {
+                return checkVideo(result, ticker)
+            })
+        }).catch((err) => console.log(err));
+    });
+}
+
+loadFirstTicker = async (req, res) => {
+    const query = Ticker.find()
+			.sort({ "metadata.symbol": "1" })
+			.skip(0)
+            .limit(1);
+            
+    return Promise.all(
+        [query, Ticker.find().countDocuments()]
+    ).then(
+        results => {
+            let symbol = results[0]
+            currentVideo = 0
+            videoCount = results[1]
+
+            let finalSymbol = symbol[0].metadata.symbol
+
+
+            if(symbol[0] && symbol[0].metadata) {
+                setTimeout(() => {
+                    searchVideos(finalSymbol)
+                    loadNextTicker()
+
+                    return console.log({
+                        ticker: symbol[0].metadata.symbol,
+                        count: results[1]
+                    });
+                }, 1000)
+                
+            }
+
+            
+        }
+    );
+}
+
+loadNextTicker = async (req, res) => {
+    currentVideo = currentVideo + 1
+
+    const query = Ticker.find()
+			.sort({ "metadata.symbol": "1" })
+			.skip(currentVideo)
+            .limit(1);
+            
+    return Promise.all(
+        [query, Ticker.find().countDocuments()]
+    ).then(
+        results => {
+            let symbol = results[0]
+
+            if(symbol[0].metadata) {
+                searchVideos(symbol[0].metadata.symbol)
+
+                setTimeout(() => {
+                    if(currentVideo  < results[1] -1) {
+                        loadNextTicker()
+                    } else{
+                        currentVideo = 0
+                        setTimeout(() => {
+                            loadFirstTicker()
+                        }, 10000)
+                    }
+
+                    return console.log({
+                        ticker: symbol[0].metadata.symbol,
+                        count: results[1]
+                    });
+                }, 1000)
+
+                
+            }
+        }
+    );
+}
+
+
 module.exports = app => {
+
+    
     var job = new CronJob(
-        '*/2 * * * * *',
+        '*/5 * * * * *',
         function() {
 
-            const ticker = "AQB"
+            const ticker = "AAPL"
 
-            YoutubeSearch.search(ticker, {sp : "CAI%253D"}).then(results => {
-                results.videos.map((result) => {
-                    return checkVideo(result, ticker)
-                })
-            }).catch((err) => console.log(err));
+            
 
             
             // Proxy.aggregate([{ $sample: { size: 1 } }]).then(random => {
@@ -126,4 +229,7 @@ module.exports = app => {
     );
 
     job.start()
+    loadFirstTicker()
+
 }
+
