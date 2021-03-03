@@ -18,6 +18,11 @@ const io = require('socket.io')(3100, {
 	}
 })
 
+io.configure(function () { 
+    io.set("transports", ["xhr-polling"]); 
+    io.set("polling duration", 10); 
+  });
+
 io.on('connection',(socket)=>{
     socket.emit('rejectvideo',(data)=>{     
         return('reject from socket')
