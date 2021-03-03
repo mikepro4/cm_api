@@ -61,7 +61,6 @@ require("./routes/proxyRoutes")(app);
 require("./routes/videoRoutes")(app);
 require("./routes/scrapingRoutes")(app);
 
-require("./cron/scraping");
 
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT);
@@ -78,4 +77,6 @@ io.on('connection',(socket)=>{
     })
 
 })
+
+require("./cron/scraping") (io);
 
