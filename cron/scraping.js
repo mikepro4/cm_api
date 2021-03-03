@@ -39,9 +39,38 @@ function checkVideo(video, ticker) {
                             resolve(video)
                         }
                     } else {
-                        let linked = _.includes(result.linkedTickers, { symbol: ticker})
-                        if (linked) {
-                            console.log("update video")
+
+                        let linked = _.find(result.linkedTickers, { symbol: ticker})
+                        
+                        if (!linked) {
+
+                            let newLinked = [
+                                ...result.linkedTickers,
+                                {
+                                    symbol: ticker
+                                }
+                            ]
+
+                            Video.update(
+                                {
+                                    _id: result._id
+                                },
+                                {
+                                    $set: { linkedTickers: newLinked }
+                                },
+                                async (err, info) => {
+                                    if (info) {
+
+
+                                        Video.findOne({ _id: result._id }, async (err, video) => {
+                                            if (video) {
+                                                console.log("update video")
+                                                resolve(video)
+                                            }
+                                        });
+                                    }
+                                }
+                            );
                         } else {
                             console.log("reject video")
                         }
@@ -238,7 +267,7 @@ module.exports = app => {
     );
 
     job.start()
-    // loadFirstTicker()
+    loadFirstTicker()
 
 }
 

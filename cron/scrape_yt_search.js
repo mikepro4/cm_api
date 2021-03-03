@@ -131,17 +131,18 @@ function load(query, options, proxy) {
     return new Promise((resolve, reject) => {
         request({
             url: url,
-            proxy: "http://" + proxy,
+            // proxy: "http://" + proxy,
+            proxy: keys.sp,
             headers: {
                 'User-Agent': 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Safari/537.36.'
             }
         })
         .then((response) => {resolve(response)})
         .catch((err) => {
-            Proxy.remove({ "metadata.ip": proxy }, async (err) => {
-                if (err) return res.send(err);
-                reject("deleted proxy")
-            });
+            // Proxy.remove({ "metadata.ip": proxy }, async (err) => {
+            //     if (err) return res.send(err);
+            //     reject("deleted proxy")
+            // });
         })
     });
 
