@@ -54,8 +54,9 @@ require("./routes/main")(app);
 require("./routes/tickerRoutes")(app);
 require("./routes/proxyRoutes")(app);
 require("./routes/videoRoutes")(app);
+require("./routes/scrapingRoutes")(app);
 
-require("./cron/scraping")(app);
+require("./cron/scraping");
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT);

@@ -127,7 +127,7 @@ function parseData(data)  {
 function load(query, options, proxy) {
     const url = getURL(query, options);
 
-    console.log(proxy)
+    // console.log(proxy)
     return new Promise((resolve, reject) => {
         request({
             url: url,
