@@ -15,14 +15,6 @@ module.exports = app => {
     
     // ===========================================================================
 
-    app.get("/scraping/config", async (req, res) => {
-        Scraping.findOne({}, async (err, scraping) => {
-			if (scraping) {
-				res.json(scraping);
-			}
-		});
-    });
-
     app.post("/scraping/update", async (req, res) => {
         Scraping.update(
 			{
@@ -58,6 +50,18 @@ module.exports = app => {
             }
 		});
     });
+
+    
+    // ===========================================================================
+
+    app.get("/scraping/search_results/status", async (req, res) => {
+        Scraping.findOne({}, async (err, scraping) => {
+			if (scraping) {
+				res.json(scraping);
+			}
+		});
+    });
+
 };
 
 
