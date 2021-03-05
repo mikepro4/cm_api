@@ -9,7 +9,7 @@ const scrapingSchema = new Schema({
     cycleEnd: Number,
     cycleDuration: Number,
     scrapingPaused: Boolean,
-    scrapingPausedTicker: String
+    scrapingPausedTicker: {}
 });
 
 

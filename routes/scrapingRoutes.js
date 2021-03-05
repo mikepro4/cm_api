@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const { toggleScraper} = require('./../cron/scraping');
 const Scraping = mongoose.model("scraping");
 
+const { start , stop} = require("../scraping/search_results")
+
 module.exports = app => {
 
 	// ===========================================================================
@@ -60,6 +62,48 @@ module.exports = app => {
 				res.json(scraping);
 			}
 		});
+    });
+
+    // ===========================================================================
+
+    app.post("/scraping/search_results/start", async (req, res) => {
+        Scraping.update(
+			{
+				_id: req.body.id
+			},
+			{
+				$set:  {
+                    scrapingSearchActive: true
+                }
+			},
+			async (err, result) => {
+				if (result) {
+                    start()
+					res.json(result);
+				}
+			}
+		);
+    });
+
+    // ===========================================================================
+
+    app.post("/scraping/search_results/stop", async (req, res) => {
+        Scraping.update(
+			{
+				_id: req.body.id
+			},
+			{
+				$set:  {
+                    scrapingSearchActive: false
+                }
+			},
+			async (err, result) => {
+				if (result) {
+                    stop()
+					res.json(result);
+				}
+			}
+		);
     });
 
 };
