@@ -5,13 +5,14 @@ const proxySchema = new Schema({
     createdAt: { type: Date, default: Date.now },
     metadata: {
         ip: String,
-        port: String
-    }
+        source: String
+    },
+    banned: { type: Boolean, default: false },
+    working: { type: Boolean, default: true }
 });
 
 proxySchema.index({
 	"metadata.ip": "text",
-	"metadata.port": "text",
 });
 
 mongoose.model("proxies", proxySchema);

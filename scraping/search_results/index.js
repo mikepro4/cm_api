@@ -30,7 +30,7 @@ let scraperStatus = {
         proxyErrors: 0
     },
     previousCycle: null,
-    useSmartproxy: true,
+    useSmartproxy: false,
     sorting: "CAISBAgCEAE"
 }
 
@@ -72,10 +72,10 @@ initialSetup()
 function searchVideos(ticker) {
     return Proxy.aggregate([{ $sample: { size: 1 } }]).then(random => {
 
-        let proxy = random[0].metadata.ip
+        let proxy = "http://" + random[0].metadata.ip
 
         if(scraperStatus.useSmartproxy) {
-            proxy =  "sp"
+            proxy =  keys.sp
         }
 
         io.emit('tickerUpdate', {
@@ -87,7 +87,8 @@ function searchVideos(ticker) {
             .search(
                 ticker, 
                 {sp: scraperStatus.sorting },
-                proxy
+                proxy,
+                io
             )
             .then(results => {
                 results.videos.map((result) => {
@@ -261,7 +262,7 @@ loadNextTicker = async (req, res) => {
                             if(scraperStatus.active) {
                                 loadFirstTicker()
                             }
-                        }, 10000)
+                        }, 100000)
                     }
 
                     return console.log({
@@ -275,8 +276,3 @@ loadNextTicker = async (req, res) => {
         }
     );
 }
-
-
-// if(scraperStatus.active) {
-//     loadFirstTicker()
-// }

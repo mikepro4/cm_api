@@ -9,7 +9,7 @@ function getURL(query, options) {
     let sp = [(options.type || 'video')];
 
     url.search = new URLSearchParams({
-        search_query: query
+        search_query: query + " stock"
     }).toString();
 
     if (options.sp) sp = options.sp;
@@ -17,7 +17,7 @@ function getURL(query, options) {
     return url.href + '&sp=' + sp;
 }
 
-function extractRenderData(page) {
+function extractRenderData(page, proxy, query) {
     return new Promise((resolve, reject) => {
         try {
             // #1 - Remove line breaks
@@ -42,6 +42,10 @@ function extractRenderData(page) {
 
                 // Filter only the search results, exclude ads and promoted content
                 render = primary.sectionListRenderer.contents.filter((item) => {
+                    if(!item.itemSectionRenderer) {
+                        console.log("problem " + query + " " + proxy)
+                    }
+                    
                     return (
                         item.itemSectionRenderer &&
                         item.itemSectionRenderer.contents &&
@@ -121,18 +125,23 @@ function parseData(data)  {
 function load(query, options, proxy) {
     const url = getURL(query, options);
 
-    // console.log(proxy)
+    console.log(proxy)
     return new Promise((resolve, reject) => {
         request({
             url: url,
             // proxy: "http://" + proxy,
-            proxy: keys.sp,
+            proxy: proxy,
             headers: {
                 'User-Agent': 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Safari/537.36.'
             }
         })
         .then((response) => {resolve(response)})
         .catch((err) => {
+            if(err.statusCode == 429) {
+                console.log("banned " + proxy)
+            } else {
+                console.log(err)
+            }
             // Proxy.remove({ "metadata.ip": proxy }, async (err) => {
             //     if (err) return res.send(err);
             //     reject("deleted proxy")
@@ -153,7 +162,7 @@ exports.search = function(query, options, proxy) {
         try {
             options = { ...options, _debugid: getDebugID() };
             const page = await load(query, options, proxy);
-            const data = await extractRenderData(page);
+            const data = await extractRenderData(page, proxy, query);
             const results = await parseData(data);
 
             /**

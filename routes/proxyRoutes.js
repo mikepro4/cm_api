@@ -1,6 +1,7 @@
 const _ = require("lodash");
 const mongoose = require("mongoose");
 const Proxy = mongoose.model("proxies");
+const request = require('request-promise');
 
 module.exports = app => {
 
@@ -102,6 +103,78 @@ module.exports = app => {
 			}
 		);
 	});
+
+	// ===========================================================================
+
+	app.post("/proxies/test", async (req, res) => {
+		return new Promise((resolve, reject) => {
+			request({
+				url: "https://www.youtube.com/results?search_query=pltr&sp=CAISAhAB",
+				proxy: "http://" + req.body.proxy,
+				headers: {
+					'User-Agent': 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Safari/537.36.'
+				}
+			})
+			.then((response, err) => {
+				res.json({ working: true, response: response });
+			})
+			.catch((err) => {
+				if(err.statusCode == 429) {
+					res.json({ working: false, banned: true });
+				} else {
+					console.log(err)
+					res.json({ working: false, error: err})
+				}
+			})
+		});
+	});
+
+	// ===========================================================================
+
+	app.post("/proxies/update_banned", async (req, res) => {
+		Proxy.update(
+			{
+				_id: req.body.proxyId
+			},
+			{
+				$set: { banned: req.body.banned }
+			},
+			async (err, info) => {
+				if (err) res.status(400).send({ error: "true", error: err });
+				if (info) {
+					Proxy.findOne({ _id: req.body.proxyId }, async (err, proxy) => {
+						if (proxy) {
+							res.json({ success: "true", info: info, proxy: proxy });
+						}
+					});
+				}
+			}
+		);
+	});
+
+	// ===========================================================================
+
+	app.post("/proxies/update_working", async (req, res) => {
+		Proxy.update(
+			{
+				_id: req.body.proxyId
+			},
+			{
+				$set: { banned: req.body.working }
+			},
+			async (err, info) => {
+				if (err) res.status(400).send({ error: "true", error: err });
+				if (info) {
+					Proxy.findOne({ _id: req.body.proxyId }, async (err, proxy) => {
+						if (proxy) {
+							res.json({ success: "true", info: info, proxy: proxy });
+						}
+					});
+				}
+			}
+		);
+	});
+
 };
 
 const buildQuery = criteria => {
@@ -116,10 +189,10 @@ const buildQuery = criteria => {
 		});
 	}
 
-	if (criteria.port) {
+	if (criteria.source) {
 		_.assign(query, {
-			"metadata.port": {
-				$regex: new RegExp(criteria.port),
+			"metadata.source": {
+				$regex: new RegExp(criteria.source),
 				$options: "i"
 			}
 		});
