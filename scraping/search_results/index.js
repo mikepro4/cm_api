@@ -171,11 +171,11 @@ function checkVideo(video, ticker) {
                         } else {
                             console.log("reject video")
 
-                            io.emit('videoUpdate', {
-                                status: "reject",
-                                ticker: ticker,
-                                video: result
-                            })
+                            // io.emit('videoUpdate', {
+                            //     status: "reject",
+                            //     ticker: ticker,
+                            //     video: result
+                            // })
                             
                         }
                     }
