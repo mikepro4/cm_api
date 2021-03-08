@@ -35,7 +35,7 @@ app.use(
 app.use(fileUpload());
 app.use(express.static(STATIC_DIR));
 app.use(express.static(PUBLIC_DIR));
-app.use(timeout('25s'))
+app.use(timeout('15s'))
 
 const Authentication = require('./controllers/authentication');
 const passportService = require('./services/passport');
