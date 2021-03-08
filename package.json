@@ -20,6 +20,7 @@
 		"body-parser": "^1.18.3",
 		"cheerio": "^1.0.0-rc.5",
 		"cloudinary": "^1.13.2",
+		"connect-timeout": "^1.9.0",
 		"cookie-session": "^2.0.0-beta.2",
 		"cors": "^2.8.5",
 		"cron": "^1.8.2",

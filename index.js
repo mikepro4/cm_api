@@ -8,6 +8,7 @@ const keys = require("./config/keys");
 const fileUpload = require("express-fileupload")
 const PUBLIC_DIR = "public";
 const STATIC_DIR = "static";
+const timeout = require('connect-timeout')
 
 mongoose.Promise = global.Promise;
 const options = {
@@ -34,6 +35,7 @@ app.use(
 app.use(fileUpload());
 app.use(express.static(STATIC_DIR));
 app.use(express.static(PUBLIC_DIR));
+app.use(timeout('25s'))
 
 const Authentication = require('./controllers/authentication');
 const passportService = require('./services/passport');
