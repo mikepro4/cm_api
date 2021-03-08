@@ -22,6 +22,7 @@ mongoose.connect(keys.mongoURI, options,
 });
 
 const app = express();
+app.use(timeout('15s'))
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(cors());
@@ -35,7 +36,6 @@ app.use(
 app.use(fileUpload());
 app.use(express.static(STATIC_DIR));
 app.use(express.static(PUBLIC_DIR));
-app.use(timeout('15s'))
 
 const Authentication = require('./controllers/authentication');
 const passportService = require('./services/passport');

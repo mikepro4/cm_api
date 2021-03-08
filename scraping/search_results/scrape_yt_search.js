@@ -133,7 +133,8 @@ function load(query, options, proxy) {
             proxy: proxy,
             headers: {
                 'User-Agent': 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Safari/537.36.'
-            }
+            },
+            timeout: "15000"
         })
         .then((response) => {resolve(response)})
         .catch((err) => {
