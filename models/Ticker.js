@@ -6,12 +6,14 @@ const tickerSchema = new Schema({
     metadata: {
         symbol: String,
         name: String
-    }
+    },
+    active: { type: Boolean, default: true },
+    last24hours: { type: Number, default: 0 },
+    last48hours: { type: Number, default: 0 },
+    lastWeek: { type: Number, default: 0 }
 });
 
 tickerSchema.index({
-	"metadata.symbol": "text",
-	"metadata.name": "text",
 });
 
 mongoose.model("tickers", tickerSchema);
