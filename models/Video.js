@@ -24,7 +24,8 @@ const videoSchema = new Schema({
         views: String,
         uploaded: String,
         duration: Number
-    }
+    },
+    approved: { type: Boolean, default: false}
 });
 
 videoSchema.index({

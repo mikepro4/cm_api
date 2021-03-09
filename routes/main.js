@@ -4,6 +4,7 @@ const requireAuth = passport.authenticate('jwt', { session: false });
 const mongoose = require("mongoose");
 const Proxy = mongoose.model("proxies");
 const Ticker = mongoose.model("tickers");
+const Video = mongoose.model("videos");
 
 module.exports = app => {
 	app.get(
@@ -33,14 +34,20 @@ module.exports = app => {
 			.sort({ [adjustSortProperty]: order })
 			.skip(offset)
 			.limit(limit);
+			
+		const queryVideos = Video.find(buildQuery(criteria))
+			.sort({ [adjustSortProperty]: order })
+			.skip(offset)
+			.limit(limit);
 
 		return Promise.all(
-			[queryProxies.countDocuments(), queryTickers.countDocuments()]
+			[queryProxies.countDocuments(), queryTickers.countDocuments(), queryVideos.countDocuments()]
 		).then(
 			results => {
 				return res.json({
 					proxies: results[0],
 					tickers: results[1],
+					videos: results[2],
 				});
 			}
 		);
