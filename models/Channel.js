@@ -11,12 +11,7 @@ const channelSchema = new Schema({
         verified: String,
         thumbnail: String
     },
-    videosCount: Number,
-    linkedTickers: [
-      {
-        symbol: String
-      }
-    ],
+    linkedTickers: [],
     bullScore: { type: Number, default: 0}
 });
 

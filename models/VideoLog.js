@@ -3,16 +3,7 @@ const { Schema } = mongoose;
 
 const videoLogSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
-    metadata: {
-        type: String,
-        symbol: String,
-        proxy: String,
-        videoTitle: String,
-        videoThumbnail: String,
-        channelTitle: String,
-        channelUrl: String,
-        videoId: String
-    }
+    metadata: {}
 });
 
 videoLogSchema.index({

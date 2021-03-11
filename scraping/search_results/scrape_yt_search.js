@@ -4,6 +4,8 @@ const keys = require("./../../config/keys");
 const { getStreamData, getPlaylistData, getVideoData } = require('./parse_yt_search');
 const mongoose = require("mongoose");
 
+const ProxyLog = mongoose.model("proxylogs");
+
 function getURL(query, options) {
     const url = new URL('/results', 'https://www.youtube.com');
     let sp = [(options.type || 'video')];
@@ -140,8 +142,10 @@ function load(query, options, proxy) {
         .catch((err) => {
             if(err.statusCode == 429) {
                 console.log("banned " + proxy)
+                createProxyLog(proxy, query, "banned")
             } else {
                 console.log(err)
+                createProxyLog(proxy, query, "error")
             }
             // Proxy.remove({ "metadata.ip": proxy }, async (err) => {
             //     if (err) return res.send(err);
@@ -181,4 +185,26 @@ exports.search = function(query, options, proxy) {
             reject(e);
         }
     });
+}
+
+function createProxyLog(proxy, ticker, type) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const newProxyLog = await new ProxyLog({
+                createdAt: new Date(),
+                metadata: {
+                    type: type,
+                    proxy: proxy,
+                    symbol: ticker
+                }
+            }).save();
+
+            if(newProxyLog) {
+                resolve(newProxyLog)
+            }
+        }catch (e) {
+            reject(e);
+        }
+        
+    })
 }

@@ -11,6 +11,8 @@ module.exports = app => {
 		let adjustSortProperty 
 		if (sortProperty == "createdAt") {
 			adjustSortProperty = sortProperty
+		} else if (sortProperty == "last24hours") {
+			adjustSortProperty = sortProperty
 		} else {
 			adjustSortProperty = "metadata." + sortProperty
 		}
