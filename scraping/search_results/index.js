@@ -23,6 +23,7 @@ module.exports = socket => {
 let scraperStatus = {
     active: null,
     currentTicker: 0,
+    currentTickerCount: 0,
     tickerCount: 0,
     pausedTicker: null,
     currentCycle: {
@@ -225,7 +226,7 @@ function updateTickerVideoCount(ticker) {
                                 },
                                 async (err, info) => {
                                     if (info) {
-                                        console.log("updated count 24")
+                                        // console.log("updated count 24")
                                         resolve(info)
                                     }
                                 }
@@ -251,7 +252,7 @@ function updateTickerVideoCount(ticker) {
                                 },
                                 async (err, info) => {
                                     if (info) {
-                                        console.log("updated count 48")
+                                        // console.log("updated count 48")
                                         resolve(info)
                                     }
                                 }
@@ -521,9 +522,85 @@ loadNextTicker = async (req, res) => {
                         count: results[1]
                     });
                 }, 1000)
-
-                
             }
         }
     );
 }
+
+/////////////////////////////////////////
+
+loadFirstTickerCount = async (req, res) => {
+    const query = Ticker.find()
+            .sort({ "metadata.symbol": "1" })
+            .skip(0)
+            .limit(1);
+            
+    return Promise.all(
+        [query, Ticker.find().countDocuments()]
+    ).then(
+        results => {
+            let symbol = results[0]
+            scraperStatus.currentTickerCount = 0
+            tickerCount = results[1]
+
+            let finalSymbol = symbol[0].metadata.symbol
+
+
+            if(symbol[0] && symbol[0].metadata) {
+                setTimeout(() => {
+
+                    updateTickerVideoCount(finalSymbol)
+                    loadNextTickerCount()
+                }, 1000)
+                
+            }
+
+            
+        }
+    );
+}
+
+/////////////////////////////////////////
+
+loadNextTickerCount = async (req, res) => {
+    scraperStatus.currentTickerCount = scraperStatus.currentTickerCount + 1
+
+    const query = Ticker.find()
+            .sort({ "metadata.symbol": "1" })
+            .skip(scraperStatus.currentTickerCount)
+            .limit(1);
+            
+    return Promise.all(
+        [query, Ticker.find().countDocuments()]
+    ).then(
+        results => {
+            let symbol = results[0]
+
+            if(symbol[0].metadata) {
+                updateTickerVideoCount(symbol[0].metadata.symbol)
+
+                setTimeout(() => {
+                    if(scraperStatus.currentTickerCount < results[1] -1) {
+                        loadNextTickerCount()
+                    } else{
+                        scraperStatus.currentTickerCount = 0
+                    }
+                }, 1000)
+            }
+        }
+    );
+}
+
+
+var job = new CronJob(
+    '0 * * * *',
+    function() {
+        console.log("run cron count")
+        loadFirstTickerCount()
+    },
+    null,
+    true,
+    'America/Los_Angeles'
+);
+
+job.start()
