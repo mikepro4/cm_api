@@ -787,8 +787,8 @@ loadNextTickerCount = async (req, res) => {
 
 
 var job = new CronJob(
-    '0/30 * * * * *',
-    // '0 * * * *',
+    // '0/30 * * * * *',
+    '0 * * * *',
     function() {
         console.log("run cron count")
         loadFirstTickerCount()
