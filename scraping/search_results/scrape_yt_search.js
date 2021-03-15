@@ -45,7 +45,7 @@ function extractRenderData(page, proxy, query) {
                 // Filter only the search results, exclude ads and promoted content
                 render = primary.sectionListRenderer.contents.filter((item) => {
                     if(!item.itemSectionRenderer) {
-                        console.log("problem " + query + " " + proxy)
+                        // console.log("problem " + query + " " + proxy)
                     }
                     
                     return (
@@ -127,7 +127,7 @@ function parseData(data)  {
 function load(query, options, proxy) {
     const url = getURL(query, options);
 
-    console.log(proxy)
+    // console.log(proxy)
     return new Promise((resolve, reject) => {
         request({
             url: url,
@@ -141,10 +141,10 @@ function load(query, options, proxy) {
         .then((response) => {resolve(response)})
         .catch((err) => {
             if(err.statusCode == 429) {
-                console.log("banned " + proxy)
+                // console.log("banned " + proxy)
                 createProxyLog(proxy, query, "banned")
             } else {
-                console.log(err)
+                // console.log(err)
                 createProxyLog(proxy, query, "error")
             }
             // Proxy.remove({ "metadata.ip": proxy }, async (err) => {

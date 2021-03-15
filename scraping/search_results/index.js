@@ -259,6 +259,199 @@ function updateTickerVideoCount(ticker) {
                             );
                         }
                     })
+
+                    Video.find({
+                        "createdAt":{ $gt:new Date(Date.now() - 24*7*60*60 * 1000)},
+                        linkedTickers: {
+                            $elemMatch: { symbol: { $eq: ticker.metadata.symbol} }
+                        }
+                    }, async(err, result) => {
+                        if(!result) {
+                            resolve()
+                        } else {
+                            Ticker.update(
+                                {
+                                    "metadata.symbol": { $eq: ticker.metadata.symbol} 
+                                },
+                                {
+                                    $set: { thisWeek: result.length }
+                                },
+                                async (err, info) => {
+                                    if (info) {
+                                        // console.log("updated count 48")
+                                        resolve(info)
+                                    }
+                                }
+                            );
+                        }
+                    })
+
+                    Video.find({
+                        "createdAt":{ 
+                            $gt:new Date(Date.now() - 24*14*60*60 * 1000),
+                            $lt:new Date(Date.now() - 24*7*60*60 * 1000)
+                        },
+                        linkedTickers: {
+                            $elemMatch: { symbol: { $eq: ticker.metadata.symbol} }
+                        }
+                    }, async(err, result) => {
+                        if(!result) {
+                            resolve()
+                        } else {
+                            Ticker.update(
+                                {
+                                    "metadata.symbol": { $eq: ticker.metadata.symbol} 
+                                },
+                                {
+                                    $set: { previousWeek: result.length }
+                                },
+                                async (err, info) => {
+                                    if (info) {
+                                        // console.log("updated count 48")
+                                        resolve(info)
+                                    }
+                                }
+                            );
+                        }
+                    })
+
+                    let week = []
+
+                    Video.find({
+                        "createdAt":{ 
+                            $gt:new Date(Date.now() - 24*60*60 * 1000)
+                        },
+                        linkedTickers: {
+                            $elemMatch: { symbol: { $eq: ticker.metadata.symbol} }
+                        }
+                    }, async(err, result) => {
+                        week.push(result.length)
+
+                        Video.find({
+                            "createdAt":{ 
+                                $gt:new Date(Date.now() - 24*2*60*60 * 1000),
+                                $lt:new Date(Date.now() - 24*60*60 * 1000)
+                            },
+                            linkedTickers: {
+                                $elemMatch: { symbol: { $eq: ticker.metadata.symbol} }
+                            }
+                        }, async(err, result) => {
+                            week.push(result.length)
+
+                            Video.find({
+                                "createdAt":{ 
+                                    $gt:new Date(Date.now() - 24*3*60*60 * 1000),
+                                    $lt:new Date(Date.now() - 24*2*60*60 * 1000)
+                                },
+                                linkedTickers: {
+                                    $elemMatch: { symbol: { $eq: ticker.metadata.symbol} }
+                                }
+                            }, async(err, result) => {
+                                week.push(result.length)
+
+                                Video.find({
+                                    "createdAt":{ 
+                                        $gt:new Date(Date.now() - 24*4*60*60 * 1000),
+                                        $lt:new Date(Date.now() - 24*3*60*60 * 1000)
+                                    },
+                                    linkedTickers: {
+                                        $elemMatch: { symbol: { $eq: ticker.metadata.symbol} }
+                                    }
+                                }, async(err, result) => {
+                                    week.push(result.length)
+
+                                    Video.find({
+                                        "createdAt":{ 
+                                            $gt:new Date(Date.now() - 24*5*60*60 * 1000),
+                                            $lt:new Date(Date.now() - 24*4*60*60 * 1000)
+                                        },
+                                        linkedTickers: {
+                                            $elemMatch: { symbol: { $eq: ticker.metadata.symbol} }
+                                        }
+                                    }, async(err, result) => {
+                                        week.push(result.length)
+
+                                        Video.find({
+                                            "createdAt":{ 
+                                                $gt:new Date(Date.now() - 24*6*60*60 * 1000),
+                                                $lt:new Date(Date.now() - 24*5*60*60 * 1000)
+                                            },
+                                            linkedTickers: {
+                                                $elemMatch: { symbol: { $eq: ticker.metadata.symbol} }
+                                            }
+                                        }, async(err, result) => {
+                                            week.push(result.length)
+
+
+                                            Video.find({
+                                                "createdAt":{ 
+                                                    $gt:new Date(Date.now() - 24*7*60*60 * 1000),
+                                                    $lt:new Date(Date.now() - 24*6*60*60 * 1000)
+                                                },
+                                                linkedTickers: {
+                                                    $elemMatch: { symbol: { $eq: ticker.metadata.symbol} }
+                                                }
+                                            }, async(err, result) => {
+                                                week.push(result.length)
+
+                                                // let growthRate24 = week[1] * 100 / week[0]
+                                                // let growthRate48 = (week[2] + week[3]) * 100 / (week[0] + week[1])
+                                                // let growthRate72 = (week[3] + week[4] + week[5]) * 100 / (week[0] + week[1] + week[2])
+
+                                                let growthRate24
+                                                let growthRate48
+                                                let growthRate72 
+
+                                                if(week[1] == 0) {
+                                                    growthRate24 = week[0] * 100
+                                                } else {
+                                                    growthRate24 = (week[0] * 100 / week[1]) - 100
+                                                }
+
+                                                if((week[2] + week[3]) == 0) {
+                                                    growthRate48 = (week[0] + week[1]) * 100
+                                                } else {
+                                                    growthRate48 = ((week[0] + week[1]) * 100 / (week[2] + week[3])) - 100
+                                                }
+
+                                                if((week[3] + week[4] + week[5]) == 0) {
+                                                    growthRate72 = (week[0] + week[1] + week[2]) * 100
+                                                } else {
+                                                    growthRate72 = ((week[0] + week[1] + week[2]) * 100 / (week[3] + week[4] + week[5])) - 100
+                                                }
+
+                                                // let growthRate24 = (week[0] * 100 / week[1]) - 100
+                                                // let growthRate48 = ((week[0] + week[1]) * 100 / (week[2] + week[3])) - 100
+                                                // let growthRate72 = ((week[0] + week[1] + week[2]) * 100 / (week[3] + week[4] + week[5])) - 100
+
+                                                Ticker.update(
+                                                    {
+                                                        "metadata.symbol": { $eq: ticker.metadata.symbol} 
+                                                    },
+                                                    {
+                                                        $set: { 
+                                                            week: week,
+                                                            growthRate24: growthRate24,
+                                                            growthRate48: growthRate48,
+                                                            growthRate72: growthRate72,
+                                                        }
+                                                    },
+                                                    async (err, info) => {
+                                                        if (info) {
+                                                            // console.log("updated count 48")
+                                                            resolve(info)
+                                                        }
+                                                    }
+                                                );
+                                            })
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                        
+                    })
+
                     resolve(ticker)
                 }
             });
@@ -268,6 +461,7 @@ function updateTickerVideoCount(ticker) {
         
     })
 }
+
 
 /////////////////////////////////////////
 
@@ -593,7 +787,8 @@ loadNextTickerCount = async (req, res) => {
 
 
 var job = new CronJob(
-    '0 * * * *',
+    '0/30 * * * * *',
+    // '0 * * * *',
     function() {
         console.log("run cron count")
         loadFirstTickerCount()
