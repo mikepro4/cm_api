@@ -15,6 +15,7 @@ const tickerSchema = new Schema({
     growthRate24: { type: Number, default: 0 },
     growthRate48: { type: Number, default: 0 },
     growthRate72: { type: Number, default: 0 },
+    score: { type: Number, default: 0 },
     week: []
 
 });

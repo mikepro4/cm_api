@@ -423,6 +423,9 @@ function updateTickerVideoCount(ticker) {
                                                 // let growthRate24 = (week[0] * 100 / week[1]) - 100
                                                 // let growthRate48 = ((week[0] + week[1]) * 100 / (week[2] + week[3])) - 100
                                                 // let growthRate72 = ((week[0] + week[1] + week[2]) * 100 / (week[3] + week[4] + week[5])) - 100
+                                                let fullWeek = week[0] + week[1] + week[2] + week[3] + week[4] + week[5] + week[6]
+                                                let score = (fullWeek * 100 + week[0] * 250 + week[1] * 200 + growthRate24 * 175)/(100+250+200+175)
+                                                
 
                                                 Ticker.update(
                                                     {
@@ -434,6 +437,7 @@ function updateTickerVideoCount(ticker) {
                                                             growthRate24: growthRate24,
                                                             growthRate48: growthRate48,
                                                             growthRate72: growthRate72,
+                                                            score: score
                                                         }
                                                     },
                                                     async (err, info) => {
@@ -787,8 +791,8 @@ loadNextTickerCount = async (req, res) => {
 
 
 var job = new CronJob(
-    // '0/30 * * * * *',
-    '0 * * * *',
+    '0/30 * * * * *',
+    // '0 * * * *',
     function() {
         console.log("run cron count")
         loadFirstTickerCount()
