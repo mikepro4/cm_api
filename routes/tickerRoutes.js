@@ -17,7 +17,7 @@ module.exports = app => {
 			adjustSortProperty = "metadata." + sortProperty
 		}
 		const query = Ticker.find(buildQuery(criteria))
-			.sort({ [adjustSortProperty]: order })
+			.sort({[adjustSortProperty]: order, "_id": 1})
 			.skip(offset)
 			.limit(limit);
 
