@@ -18,6 +18,14 @@ module.exports = app => {
         )
     });
 
+    app.post("/prices/week", async (req, res) => {
+        console.log(req.body)
+
+        yahooFinance.historical(req.body, function (err, quotes) {
+            res.json(quotes);
+        })
+    });
+
 };
 
 const buildQuery = criteria => {
