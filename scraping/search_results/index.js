@@ -203,6 +203,21 @@ function checkVideo(video, ticker) {
     })
 }
 
+// function fetchVideoSeries(ticker, days) {
+//     return new Promise(async (resolve, reject) => {
+//         try {
+//             let videoSeries = []
+//             var i;
+//             for (i = 0; i < days; i++) {
+
+//             }
+//         }catch (e) {
+//             reject(e);
+//         }
+//     })
+// }
+
+
 function updateTickerVideoCount(ticker) {
     return new Promise(async (resolve, reject) => {
         try {

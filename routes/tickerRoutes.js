@@ -9,12 +9,10 @@ module.exports = app => {
 	app.post("/tickers/search", async (req, res) => {
 		const { criteria, sortProperty, offset, limit, order } = req.body;
 		let adjustSortProperty 
-		if (sortProperty == "createdAt") {
-			adjustSortProperty = sortProperty
-		} else if (sortProperty == "last24hours") {
-			adjustSortProperty = sortProperty
-		} else {
+		if (sortProperty == "symbol"){
 			adjustSortProperty = "metadata." + sortProperty
+		} else {
+			adjustSortProperty = sortProperty
 		}
 		const query = Ticker.find(buildQuery(criteria))
 			.sort({[adjustSortProperty]: order, "_id": 1})
