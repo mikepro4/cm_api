@@ -17,6 +17,8 @@ let streamifier = require('streamifier');
 const avatar = Avatar.githubBuilder(128);
 const { v4: uuidv4 } = require('uuid');
 
+const _ = require("lodash");
+
 cloudinary.config({ 
 	cloud_name: keys.cloudName, 
 	api_key: keys.apiKey, 
@@ -43,7 +45,7 @@ module.exports = app => {
 									_id: req.user._id
 								},
 								{
-									$set: { avatar: result.url }
+									$set: { avatar: result.url, avatarDefault: true }
 								},
 								async (err, info) => {
 									if (err) res.status(400).send({ error: "true", error: err });
@@ -71,6 +73,50 @@ module.exports = app => {
             res.send(req.user)
 		}
 	);
+
+	app.post(
+		"/update_username",
+		requireAuth,
+		(req, res) => {
+			if(/[^a-zA-Z0-9]/.test(req.body.username.toLowerCase())) {
+				res.json({ success: "Don't even try"});
+			} else {
+				User.update(
+					{
+						_id: req.user._id
+					},
+					{
+						$set: { username: req.body.username.toLowerCase() }
+					},
+					async (err, info) => {
+						if (err) res.status(400).send({ error: "true", error: err });
+						if (info) {
+							User.findOne({ _id: req.user._id }, async (err, user) => {
+								if (user) {
+									res.json({ success: "true", info: info, user: user });
+								}
+							});
+						}
+					}
+				);
+			}
+		}
+	)
+
+	app.post("/validate_username", async (req, res) => {
+		const { username } = req.body;
+		return User.find(
+			{
+				"username": { $eq: username.toLowerCase() }
+			},
+			async (err, result) => {
+				if (!_.isEmpty(result)) return res.status(500).send("Already exists");
+				res.json({ status: "ok" });
+			}
+		);
+	});
+
+	
 
 	// ===========================================================================
 
