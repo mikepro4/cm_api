@@ -1,4 +1,5 @@
 const passport = require('passport');
+const keys = require("../config/keys");
 const requireAuth = passport.authenticate('jwt', { session: false });
 
 const mongoose = require("mongoose");
@@ -7,8 +8,62 @@ const Ticker = mongoose.model("tickers");
 const Video = mongoose.model("videos");
 const Channel = mongoose.model("channels");
 const Group = mongoose.model("groups");
+const User = mongoose.model("user");
+
+const Avatar = require('avatar-builder');
+const cloudinary = require('cloudinary').v2;
+let streamifier = require('streamifier');
+
+const avatar = Avatar.githubBuilder(128);
+const { v4: uuidv4 } = require('uuid');
+
+cloudinary.config({ 
+	cloud_name: keys.cloudName, 
+	api_key: keys.apiKey, 
+	api_secret: keys.apiSecret
+});
 
 module.exports = app => {
+
+	app.post(
+		"/assign_avatar",
+		requireAuth,
+		(req, res) => {
+			avatar.create(uuidv4()).then(
+				buffer => {
+					let cld_upload_stream = cloudinary.uploader.upload_stream(
+						{
+						  folder: "cashmachine/avatars"
+						},
+						function(error, result) {
+							console.log(error, result);
+
+							User.update(
+								{
+									_id: req.user._id
+								},
+								{
+									$set: { avatar: result.url }
+								},
+								async (err, info) => {
+									if (err) res.status(400).send({ error: "true", error: err });
+									if (info) {
+										User.findOne({ _id: req.user._id }, async (err, user) => {
+											if (user) {
+												res.json({ success: "true", info: info, user: user });
+											}
+										});
+									}
+								}
+							);
+						}
+					);
+					streamifier.createReadStream(buffer).pipe(cld_upload_stream);
+				}
+			);
+		}
+	);
+
 	app.get(
         "/user_details",
         requireAuth,
@@ -72,6 +127,8 @@ module.exports = app => {
 			}
 		);
 	});
+
+	
 };
 
 const buildQuery = criteria => {
