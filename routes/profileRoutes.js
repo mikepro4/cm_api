@@ -53,19 +53,20 @@ module.exports = app => {
 	});
 
 	app.post("/connection/get_followers", async (req, res) => {
-		Connection.findAll({ "subject._id": req.body.objectId}, async (err, results) => {
+		Connection.find({ "subject._id": req.body.objectId}, async (err, results) => {
+			console.log(results)
 			if (err) return res.send(err);
 			res.json({
-				count: results.count()
+				count: results.length
 			});
 		})
 	})
 
 	app.post("/connection/get_following", async (req, res) => {
-		Connection.findAll({ "object._id": req.body.objectId}, async (err, results) => {
+		Connection.find({ "object._id": req.body.objectId}, async (err, results) => {
 			if (err) return res.send(err);
 			res.json({
-				count: results.count()
+				count: results.length
 			});
 		})
 	})
