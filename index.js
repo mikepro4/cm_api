@@ -62,6 +62,11 @@ require("./models/ChannelLog");
 require("./models/Group");
 require("./models/Scraping");
 
+require("./models/Connection");
+require("./models/Notification");
+require("./models/Post");
+require("./models/Wall");
+
 require("./routes/main")(app);
 require("./routes/tickerRoutes")(app);
 require("./routes/proxyRoutes")(app);
@@ -73,6 +78,7 @@ require("./routes/channelLogRoutes")(app);
 require("./routes/groupRoutes")(app);
 require("./routes/scrapingRoutes")(app);
 require("./routes/prices")(app);
+require("./routes/profileRoutes")(app);
 
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT);
