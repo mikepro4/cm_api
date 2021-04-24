@@ -8,8 +8,13 @@ const userSchema = new Schema({
   password: String,
   created: { type: Date, default: Date.now },
   avatar: String,
+  avatarGradient: Number,
   avatarDefault: Boolean,
-  username: String
+  cover: String,
+  coverGradient: { type: Number, default: 1 },
+  username: String,
+  bio: String,
+  url: String
 });
 
 // On Save Hook, encrypt password

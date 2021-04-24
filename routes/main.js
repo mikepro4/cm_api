@@ -172,14 +172,89 @@ module.exports = app => {
 				});
 			}
 		);
-	});
+    });
+    
+    app.post(
+		"/suggestions",
+		requireAuth,
+		(req, res) => {
+            const tickers = Ticker.find({
+                        "metadata.symbol": {
+                            $regex: new RegExp(req.body.query),
+                            $options: "i"
+                        }
+                    })
+                .sort({ "score": -1 })
+                .skip(0)
+                .limit(5);
+
+            const users = User.find({
+                        "username": {
+                            $regex: new RegExp(req.body.query),
+                            $options: "i"
+                        }
+                    })
+                    .sort({ "createdAt": -1 })
+                .skip(0)
+                .limit(5);
+
+           
+                
+            return Promise.all(
+                [
+                    tickers, 
+                    users, 
+                ]
+            ).then(
+                results => {
+
+                    let newTickers = _.map(results[0], (ticker) => {
+                        return {
+                            type: "ticker",
+                            name: ticker.metadata.symbol,
+                            ticker: ticker
+                        }
+                    })
+        
+                    let newUsers = _.map(results[1], (user) => {
+                        return {
+                            type: "user",
+                            name: user.username,
+                            user: user
+                        }
+                    })
+
+                    let suggestions =_.merge(newUsers, newTickers );
+
+                    return res.json(suggestions);
+                }
+            );
+		}
+	)
 
 	
 };
 
 const buildQuery = criteria => {
-	const query = {};
+    const query = {};
+    
+    if (criteria.symbol) {
+		_.assign(query, {
+			"metadata.symbol": {
+				$regex: new RegExp(criteria.symbol),
+				$options: "i"
+			}
+		});
+	}
 
+	if (criteria.name) {
+		_.assign(query, {
+			"metadata.name": {
+				$regex: new RegExp(criteria.name),
+				$options: "i"
+			}
+		});
+	}
 	return query
 };
 
