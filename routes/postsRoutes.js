@@ -145,7 +145,7 @@ const buildQuery = criteria => {
 	if (criteria.userId) {
 		_.assign(query, {
 			"user._id": {
-				$regex: new RegExp(criteria.symbol),
+				$regex: new RegExp(criteria.userId),
 				$options: "i"
 			}
 		});
