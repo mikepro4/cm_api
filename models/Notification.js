@@ -4,9 +4,10 @@ const { Schema } = mongoose;
 const notificationSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
     user: {},
-    message: String,
     type: String,
-    link: String
+    link: String,
+    relatedContentType: String,
+    relatedContentId: String
 });
 
 notificationSchema.index({

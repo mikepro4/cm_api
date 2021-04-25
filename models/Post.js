@@ -3,9 +3,10 @@ const { Schema } = mongoose;
 
 const postSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
-    content: "",
+    content: {},
     user: {},
     linkedTickers: [],
+    linkedUsers: [],
     sentiment: String
 });
 

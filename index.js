@@ -79,6 +79,7 @@ require("./routes/groupRoutes")(app);
 require("./routes/scrapingRoutes")(app);
 require("./routes/prices")(app);
 require("./routes/profileRoutes")(app);
+require("./routes/postsRoutes")(app);
 
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT);

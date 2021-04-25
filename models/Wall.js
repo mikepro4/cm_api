@@ -3,8 +3,11 @@ const { Schema } = mongoose;
 
 const wallSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
-    owner: String,
-    lastUpdated: { type: Date, default: Date.now }
+    userId: String,
+    contentType: String,
+    contentId: String,
+    context: String,
+    symbol: String
 });
 
 wallSchema.index({
