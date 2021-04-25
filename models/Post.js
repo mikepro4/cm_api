@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const postSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
-    content: {},
+    content: String,
     user: {},
     linkedTickers: [],
     linkedUsers: [],

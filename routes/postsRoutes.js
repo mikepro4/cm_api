@@ -112,7 +112,7 @@ module.exports = app => {
     
     // ===========================================================================
 
-    app.post("/posts/update", async (req, res) => {
+    app.post("/post/update", async (req, res) => {
 		Post.update(
 			{
 				_id: req.body.postId
@@ -128,8 +128,8 @@ module.exports = app => {
 				if (err) res.status(400).send({ error: "true", error: err });
 				if (Post) {
 					Post.findOne({ _id: req.body.postId }, async (err, post) => {
-						if (user) {
-							res.json(user);
+						if (post) {
+							res.json(post);
 						}
 					});
 				}

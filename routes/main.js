@@ -224,7 +224,15 @@ module.exports = app => {
                         }
                     })
 
-                    let suggestions =_.merge(newUsers, newTickers );
+                    let suggestions
+
+                    if(req.body.trigger == "@") {
+                        suggestions =_.merge(newTickers, newUsers );
+                    }
+
+                    if(req.body.trigger == "$") {
+                        suggestions =_.merge(newUsers, newTickers );
+                    }
 
                     return res.json(suggestions);
                 }
