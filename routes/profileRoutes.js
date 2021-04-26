@@ -62,7 +62,16 @@ module.exports = app => {
 	})
 
 	app.post("/connection/get_following", async (req, res) => {
-		Connection.find({ "object._id": req.body.objectId}, async (err, results) => {
+		Connection.find({ "object._id": req.body.objectId, "subject.symbol": { $exists: false }}, async (err, results) => {
+			if (err) return res.send(err);
+			res.json({
+				count: results.length
+			});
+		})
+    })
+    
+    app.post("/connection/get_ticker_following", async (req, res) => {
+		Connection.find({ "object._id": req.body.objectId, "subject.symbol": { $exists: true }}, async (err, results) => {
 			if (err) return res.send(err);
 			res.json({
 				count: results.length

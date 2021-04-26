@@ -10,6 +10,7 @@ const Channel = mongoose.model("channels");
 const Group = mongoose.model("groups");
 const User = mongoose.model("user");
 const Post = mongoose.model("posts");
+const Connection = mongoose.model("connections");
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -48,8 +49,44 @@ module.exports = app => {
                         req.body.linkedUsers,
                         newUser
                     )
+
+                    _.map(req.body.linkedTickers, async (ticker) => {
+                        return Promise.all(
+                            [Connection.find({
+                                "object._id": req.body.user._id,
+                                "subject.symbol": ticker
+                            }).countDocuments()]
+                        ).then(
+                            async(results) => {
+                                console.log(results[0])
+                                if(results[0] == 0) {
+                                    console.log("create")
+                                    const connection = await new Connection({
+                                        createdAt: new Date(),
+                                        object: newUser,
+                                        subject: { symbol: ticker}
+                                    }).save();
+                                }
+                            //     return res.json({
+                            //         all: results[0],
+                            //         count: results[1],
+                            //         offset: offset,
+                            //         limit: limit
+                            //     });
+                            }
+                        );
+
+                        // if(!query) {
+                        //     const connection = await new Connection({
+                        //         createdAt: new Date(),
+                        //         object: newUser,
+                        //         subject: { symbol: ticker}
+                        //     }).save();
+                        // }
+                    })
                 }
             });
+            
         }
 		res.json(connection);
     });
@@ -112,7 +149,7 @@ module.exports = app => {
     
     // ===========================================================================
 
-    app.post("/post/update", async (req, res) => {
+    app.post("/post/update", requireAuth, async (req, res) => {
 		Post.update(
 			{
 				_id: req.body.postId
@@ -131,7 +168,50 @@ module.exports = app => {
 						if (post) {
 							res.json(post);
 						}
-					});
+                    });
+
+                    let newUser = {
+                        "_id": req.user._id.toString(),
+                        avatar: req.user.avatar,
+                        avatarDefault: req.user.avatarDefault,
+                        avatarGradient: req.user.avatarGradient,
+                        username: req.user.username
+                    }
+                    
+                    _.map(req.body.linkedTickers, async (ticker) => {
+                        return Promise.all(
+                            [Connection.find({
+                                "object._id": req.user._id.toString(),
+                                "subject.symbol": ticker
+                            }).countDocuments()]
+                        ).then(
+                            async(results) => {
+                                console.log(results[0])
+                                if(results[0] == 0) {
+                                    console.log("create")
+                                    const connection = await new Connection({
+                                        createdAt: new Date(),
+                                        object: newUser,
+                                        subject: { symbol: ticker}
+                                    }).save();
+                                }
+                            //     return res.json({
+                            //         all: results[0],
+                            //         count: results[1],
+                            //         offset: offset,
+                            //         limit: limit
+                            //     });
+                            }
+                        );
+
+                        // if(!query) {
+                        //     const connection = await new Connection({
+                        //         createdAt: new Date(),
+                        //         object: newUser,
+                        //         subject: { symbol: ticker}
+                        //     }).save();
+                        // }
+                    })
 				}
 			}
 		);
