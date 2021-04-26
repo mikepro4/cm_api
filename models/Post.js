@@ -7,7 +7,9 @@ const postSchema = new Schema({
     user: {},
     linkedTickers: [],
     linkedUsers: [],
-    sentiment: String
+    sentiment: String,
+    deleted: { type: Boolean, default: false},
+    linkedImages: []
 });
 
 postSchema.index({

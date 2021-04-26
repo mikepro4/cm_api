@@ -35,7 +35,8 @@ module.exports = app => {
             linkedTickers: req.body.linkedTickers,
             linkedUsers: req.body.linkedUsers,
             sentiment: req.body.sentiment,
-            clientWidth: req.body.clientWidth
+            clientWidth: req.body.clientWidth,
+            linkedImages: req.body.uploadedImages
         }).save();
         if(connection) {
 
@@ -67,22 +68,8 @@ module.exports = app => {
                                         subject: { symbol: ticker}
                                     }).save();
                                 }
-                            //     return res.json({
-                            //         all: results[0],
-                            //         count: results[1],
-                            //         offset: offset,
-                            //         limit: limit
-                            //     });
                             }
                         );
-
-                        // if(!query) {
-                        //     const connection = await new Connection({
-                        //         createdAt: new Date(),
-                        //         object: newUser,
-                        //         subject: { symbol: ticker}
-                        //     }).save();
-                        // }
                     })
                 }
             });
@@ -131,15 +118,28 @@ module.exports = app => {
     
     // ===========================================================================
 
-	app.post("/posts/delete", async (req, res) => {
+	app.post("/posts/delete", requireAuth, async (req, res) => {
         if(req.user._id == req.body.post.user._id) {
-            Post.remove({ _id: req.body.postId }, async (err) => {
-                if (err) return res.send(err);
-                res.json({
-                    success: "true",
-                    message: "deleted post"
-                });
-            });
+            Post.update(
+                {
+                    _id: req.body.postId
+                },
+                {
+                    $set: { 
+                        deleted: true
+                    }
+                },
+                async (err, info) => {
+                    if (err) res.status(400).send({ error: "true", error: err });
+                    if (Post) {
+                        Post.findOne({ _id: req.body.postId }, async (err, post) => {
+                            if (post) {
+                                res.json(post);
+                            }
+                        });
+                    }
+                }
+            );
         } else {
             res.json({
                 message: "You are not the owner. Don't even fucking try."
@@ -195,22 +195,8 @@ module.exports = app => {
                                         subject: { symbol: ticker}
                                     }).save();
                                 }
-                            //     return res.json({
-                            //         all: results[0],
-                            //         count: results[1],
-                            //         offset: offset,
-                            //         limit: limit
-                            //     });
                             }
-                        );
-
-                        // if(!query) {
-                        //     const connection = await new Connection({
-                        //         createdAt: new Date(),
-                        //         object: newUser,
-                        //         subject: { symbol: ticker}
-                        //     }).save();
-                        // }
+                        )
                     })
 				}
 			}
@@ -227,7 +213,8 @@ const buildQuery = criteria => {
 			"user._id": {
 				$regex: new RegExp(criteria.userId),
 				$options: "i"
-			}
+            },
+            "deleted": false
 		});
 	}
 
