@@ -246,7 +246,7 @@ module.exports = app => {
 const buildQuery = criteria => {
     const query = {};
     
-    if (criteria.symbol) {
+    if (criteria && criteria.symbol) {
 		_.assign(query, {
 			"metadata.symbol": {
 				$regex: new RegExp(criteria.symbol),
@@ -255,7 +255,7 @@ const buildQuery = criteria => {
 		});
 	}
 
-	if (criteria.name) {
+	if (criteria && criteria.name) {
 		_.assign(query, {
 			"metadata.name": {
 				$regex: new RegExp(criteria.name),
