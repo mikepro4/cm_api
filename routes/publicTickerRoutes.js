@@ -62,11 +62,13 @@ module.exports = app => {
         }, async (err, connection) => {
 			if (connection) {
 				res.json({
-                    following: true
+                    following: true,
+                    connection
                 });
 			} else {
                 res.json({
-                    following: false
+                    following: false,
+                    connection
                 })
             }
 		})
@@ -92,7 +94,7 @@ module.exports = app => {
 			results => {
                 userList = results[0]
 				return res.json({
-                    count: results.length,
+                    count: userList.length,
                     featured: [userList[0], userList[1], userList[2]]
                 });
 			}
@@ -145,7 +147,39 @@ module.exports = app => {
 				}
 			}
 		);
-	});
+    });
+
+    // ===========================================================================
+    
+    app.post("/public/ticker/follow", requireAuth, async (req, res) => {
+        let newUser = {
+            "_id": req.user._id.toString(),
+            avatar: req.user.avatar,
+            avatarDefault: req.user.avatarDefault,
+            avatarGradient: req.user.avatarGradient,
+            username: req.user.username
+        }
+
+		const connection = await new Connection({
+            createdAt: new Date(),
+            object: newUser,
+            subject: { symbol: req.body.symbol}
+        }).save();
+        
+		res.json(connection);
+    });
+
+    // ===========================================================================
+    
+    app.post("/public/ticker/unfollow", requireAuth, async (req, res) => {
+        Connection.remove({ _id: req.body.connectionId }, async (err) => {
+			if (err) return res.send(err);
+			res.json({
+				success: "true",
+				message: "deleted connection"
+			});
+		});
+    });
 };
 
 const buildQuery = criteria => {
