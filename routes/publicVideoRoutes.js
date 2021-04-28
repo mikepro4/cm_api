@@ -38,6 +38,27 @@ module.exports = app => {
             }
         );
     });
+
+    app.post("/public/video/disable", async (req, res) => {
+		Video.update(
+			{
+				"metadata.id": req.body.videoId
+			},
+			{
+				$set: { disabled: true }
+			},
+			async (err, info) => {
+				if (err) res.status(400).send({ error: "true", error: err });
+				if (info) {
+					Video.findOne({ "metadata.id": req.body.videoId }, async (err, video) => {
+						if (video) {
+							res.json({ success: "true", info: info, video: video });
+						}
+					});
+				}
+			}
+		);
+	});
 }
 
 const buildQuery = criteria => {
@@ -47,8 +68,13 @@ const buildQuery = criteria => {
         _.assign(query, {
             linkedTickers: {
                 $elemMatch: { symbol: { $eq: criteria.symbol } }
+            },
+            disabled: {
+                $ne: true
             }
         });
+
+
 	}
 
 	return query

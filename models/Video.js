@@ -26,6 +26,7 @@ const videoSchema = new Schema({
         duration: Number
     },
     approved: { type: Boolean, default: false},
+    disabled: { type: Boolean, default: false}
 });
 
 videoSchema.index({
