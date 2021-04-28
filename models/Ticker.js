@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 const tickerSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
+    avatar: String,
     metadata: {
         symbol: String,
         name: String

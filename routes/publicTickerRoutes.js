@@ -100,6 +100,52 @@ module.exports = app => {
     })
     
     // ===========================================================================
+
+    
+
+	app.post("/public/ticker/update", async (req, res) => {
+		Ticker.update(
+			{
+				_id: req.body.tickerId
+			},
+			{
+				$set: { "metadata.name": req.body.name }
+			},
+			async (err, info) => {
+				if (err) res.status(400).send({ error: "true", error: err });
+				if (info) {
+					Ticker.findOne({ _id: req.body.tickerId }, async (err, ticker) => {
+						if (ticker) {
+							res.json({ success: "true", info: info, ticker: ticker });
+						}
+					});
+				}
+			}
+		);
+    });
+
+    // ===========================================================================
+    
+    app.post("/public/ticker/avatar_update", async (req, res) => {
+		Ticker.update(
+			{
+				_id: req.body.tickerId
+			},
+			{
+				$set: { avatar: req.body.url }
+			},
+			async (err, info) => {
+				if (err) res.status(400).send({ error: "true", error: err });
+				if (info) {
+					Ticker.findOne({ _id: req.body.tickerId }, async (err, ticker) => {
+						if (ticker) {
+							res.json(ticker);
+						}
+					});
+				}
+			}
+		);
+	});
 };
 
 const buildQuery = criteria => {
