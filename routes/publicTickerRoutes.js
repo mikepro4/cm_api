@@ -6,6 +6,8 @@ const Connection = mongoose.model("connections");
 const passport = require('passport');
 const requireAuth = passport.authenticate('jwt', { session: false });
 
+var yahooFinance = require('yahoo-finance');
+
 module.exports = app => {
 
 	// ===========================================================================
@@ -179,6 +181,37 @@ module.exports = app => {
 				message: "deleted connection"
 			});
 		});
+    });
+
+    // ===========================================================================
+  
+    app.post("/public/ticker/prices", async (req, res) => {
+        // yahooFinance.historical(req.body, function (err, quotes) {
+        //     res.json(quotes);
+        // })
+
+        // yahooFinance.historical(req.body, function (err, quotes) {
+        //     res.json(quotes);
+        // })
+
+        const historical = yahooFinance.historical(req.body)
+        const current = yahooFinance.quote({
+            symbol: req.body.symbol,
+            modules: [ 'price', 'summaryDetail' ] 
+        })
+
+
+        return Promise.all(
+			[historical, current]
+		).then(
+			results => {
+				return res.json({
+                    history: results[0],
+                    current: results[1]
+                });
+			}
+		);
+
     });
 };
 
