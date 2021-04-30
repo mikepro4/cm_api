@@ -216,7 +216,15 @@ const buildQuery = criteria => {
             },
             "deleted": false
 		});
-	}
+    }
+    
+    if (criteria.symbol) {
+        _.assign(query, {
+			linkedTickers: {
+                $elemMatch: { $eq: criteria.symbol}
+            }
+		});
+    }
 
 	return query
 };
