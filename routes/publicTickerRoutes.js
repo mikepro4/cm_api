@@ -213,6 +213,25 @@ module.exports = app => {
 		);
 
     });
+
+    // ===========================================================================
+  
+    app.post("/public/ticker/single_price", async (req, res) => {
+
+        const current = yahooFinance.quote({
+            symbol: req.body.symbol,
+            modules: [ 'price', 'summaryDetail' ] 
+        })
+
+        return Promise.all(
+			[current]
+		).then(
+			results => {
+				return res.json(results[0]);
+			}
+		);
+
+    });
 };
 
 const buildQuery = criteria => {
