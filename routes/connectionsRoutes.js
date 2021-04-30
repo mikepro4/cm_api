@@ -19,7 +19,7 @@ const _ = require("lodash");
 
 module.exports = app => {
 
-    app.post("/connections/search", async (req, res) => {
+    app.post("/connections/followers", async (req, res) => {
         // const query1 = Connection.findOne({ "object._id": req.body.objectId, "subject._id": req.body.subjectId })
 
         const { criteria, sortProperty, offset, limit, order } = req.body;
@@ -43,6 +43,31 @@ module.exports = app => {
 		);
     });
 
+    app.post("/connections/following", async (req, res) => {
+        // const query1 = Connection.findOne({ "object._id": req.body.objectId, "subject._id": req.body.subjectId })
+        const { criteria, sortProperty, offset, limit, order } = req.body;
+        console.log(criteria)
+
+        
+		const query = Connection.find(buildQueryFollowing(criteria))
+			.sort({ [sortProperty]: order })
+			.skip(offset)
+			.limit(limit);
+
+		return Promise.all(
+			[query, Connection.find(buildQueryFollowing(criteria)).countDocuments()]
+		).then(
+			results => {
+				return res.json({
+					all: results[0],
+					count: results[1],
+					offset: offset,
+					limit: limit
+				});
+			}
+		);
+    });
+
 };
 
 const buildQuery = criteria => {
@@ -52,6 +77,32 @@ const buildQuery = criteria => {
 		_.assign(query, {
 			"subject._id": {$eq: criteria.userId}
 		});
+    }
+    
+    if (criteria.symbol) {
+        _.assign(query, {
+            "subject.symbol": {$eq: criteria.symbol}
+		});
+    }
+
+	return query
+};
+
+const buildQueryFollowing = criteria => {
+	const query = {};
+
+	if (criteria.userId && criteria.userTickers) {
+        _.assign(query, {
+            "object._id": {$eq: criteria.userId},
+            "subject.symbol": { $exists: true }
+        });
+    }
+
+    if (criteria.userId && !criteria.userTickers) {
+        _.assign(query, {
+            "object._id": {$eq: criteria.userId},
+            "subject.symbol": { $exists: false }
+        });
     }
     
     if (criteria.symbol) {
