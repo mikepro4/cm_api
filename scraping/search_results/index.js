@@ -35,7 +35,8 @@ let scraperStatus = {
     },
     previousCycle: null,
     useSmartproxy: false,
-    sorting: "CAISBAgCEAE"
+    // sorting: "CAISBAgCEAE"
+    sorting: "CAASBAgCEAE%253D"
 }
 
 module.exports.start = () => {
