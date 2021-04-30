@@ -48,15 +48,11 @@ module.exports = app => {
 const buildQuery = criteria => {
 	const query = {};
 
-	// if (criteria.userId) {
-	// 	_.assign(query, {
-	// 		"user._id": {
-	// 			$regex: new RegExp(criteria.userId),
-	// 			$options: "i"
-    //         },
-    //         "deleted": false
-	// 	});
-    // }
+	if (criteria.userId) {
+		_.assign(query, {
+			"subject._id": {$eq: criteria.userId}
+		});
+    }
     
     if (criteria.symbol) {
         _.assign(query, {
