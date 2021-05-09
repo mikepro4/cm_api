@@ -116,6 +116,67 @@ module.exports = app => {
 		);
 	});
 
+	// ===========================================================================
+
+	app.post("/search/results", async (req, res) => {
+		const { query } = req.body;
+
+		const tickers = Ticker.find({
+			$or: [ 
+				{
+					"metadata.symbol": {
+						$regex: new RegExp(query),
+						$options: "i"
+					}
+				},
+				{
+					"metadata.name": {
+						$regex: new RegExp(query),
+						$options: "i"
+					}
+				}
+			]
+		})
+			.sort({ "score": -1 })
+			.skip(0)
+			.limit(3);
+
+		const videos = Video.find({
+			"metadata.title": {
+				$regex: new RegExp(query),
+				$options: "i"
+			}
+		})
+			.sort({ "createdAt": -1 })
+			.skip(0)
+			.limit(3);
+
+		const users = User.find({
+			"username": {
+				$regex: new RegExp(query),
+				$options: "i"
+			}
+		})
+			.sort({ "username": -1 })
+			.skip(0)
+			.limit(3);
+
+		return Promise.all(
+			[
+				tickers, 
+				videos, 
+				users
+			]
+		).then(
+			results => {
+				return res.json({
+					tickers: results[0],
+					videos: results[1],
+					users: results[2],
+				});
+			}
+		);
+	});
 	
 
 	// ===========================================================================
@@ -263,6 +324,7 @@ const buildQuery = criteria => {
 			}
 		});
 	}
+
 	return query
 };
 
