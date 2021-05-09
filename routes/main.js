@@ -137,7 +137,7 @@ module.exports = app => {
 				}
 			]
 		})
-			.sort({ "score": -1 })
+			.sort({ "score": 1 })
 			.skip(0)
 			.limit(3);
 
@@ -157,7 +157,27 @@ module.exports = app => {
 				$options: "i"
 			}
 		})
-			.sort({ "username": -1 })
+			.sort({ "username": 1 })
+			.skip(0)
+			.limit(3);
+
+		const channels = Channel.find({
+			$or: [ 
+				{
+					"metadata.name": {
+						$regex: new RegExp(query),
+						$options: "i"
+					}
+				},
+				{
+					"metadata.link": {
+						$regex: new RegExp(query),
+						$options: "i"
+					}
+				}
+			]
+		})
+			.sort({ "metadata.name": 1 })
 			.skip(0)
 			.limit(3);
 
@@ -165,7 +185,8 @@ module.exports = app => {
 			[
 				tickers, 
 				videos, 
-				users
+				users,
+				channels
 			]
 		).then(
 			results => {
@@ -173,6 +194,7 @@ module.exports = app => {
 					tickers: results[0],
 					videos: results[1],
 					users: results[2],
+					channels: results[3],
 				});
 			}
 		);
