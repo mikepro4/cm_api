@@ -69,7 +69,9 @@ const buildQuery = criteria => {
             linkedTickers: {
                 $elemMatch: { symbol: { $eq: criteria.symbol } }
             },
-            approved: { $eq: true },
+            approvedFor: {
+                $elemMatch: { symbol: { $eq: criteria.symbol } }
+            },
             disabled: {
                 $ne: true
             }
