@@ -12,7 +12,7 @@ module.exports = app => {
         // CSV options if any
     }));
     for await (const record of parser) {
-        // Work with each record
+        // // Work with each record
         // console.log(record)
 
         // const ticker = await new Ticker({
