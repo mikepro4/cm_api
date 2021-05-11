@@ -14,7 +14,7 @@ module.exports = app => {
 		} else {
 			adjustSortProperty = "metadata." + sortProperty
 		}
-		const query = Video.find(buildQuery(criteria))
+		const query = Video.find({ approved: { $eq: true }})
 			.sort({ [adjustSortProperty]: order })
 			.skip(offset)
 			.limit(limit);
