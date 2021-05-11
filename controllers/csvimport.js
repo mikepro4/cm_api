@@ -13,17 +13,17 @@ module.exports = app => {
     }));
     for await (const record of parser) {
         // Work with each record
-        console.log(record)
+        // console.log(record)
 
-        const ticker = await new Ticker({
-            createdAt: new Date(),
-            metadata: {
-                symbol: record[0],
-                name: record[1]
-            }
-        }).save();
+        // const ticker = await new Ticker({
+        //     createdAt: new Date(),
+        //     metadata: {
+        //         symbol: record[0],
+        //         name: record[1]
+        //     }
+        // }).save();
 
-        records.push(record)
+        // records.push(record)
     }
     return records
     }
