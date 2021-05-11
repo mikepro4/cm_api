@@ -113,7 +113,7 @@ module.exports = app => {
 				_id: req.body.tickerId
 			},
 			{
-				$set: { "metadata.name": req.body.name }
+				$set: { "metadata.name": req.body.name, altNames: req.body.altNames, strictNameCheck: req.body.strictNameCheck, type: req.body.type}
 			},
 			async (err, info) => {
 				if (err) res.status(400).send({ error: "true", error: err });

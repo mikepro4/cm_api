@@ -17,8 +17,10 @@ const tickerSchema = new Schema({
     growthRate48: { type: Number, default: 0 },
     growthRate72: { type: Number, default: 0 },
     score: { type: Number, default: 0 },
-    week: []
-
+    week: [],
+    altNames: [],
+    strictNameCheck: { type: Boolean, default: false },
+    type: String
 });
 
 tickerSchema.index({
