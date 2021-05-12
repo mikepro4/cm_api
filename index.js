@@ -10,15 +10,6 @@ const PUBLIC_DIR = "public";
 const STATIC_DIR = "static";
 const timeout = require('connect-timeout')
 
-// var fs = require('fs');
-// var stringify = require('csv-stringify');
-    
-// stringify(someData, {
-//     header: true
-// }, function (err, output) {
-//     fs.writeFile(__dirname+'/someData.csv', output);
-// })
-
 mongoose.Promise = global.Promise;
 const options = {
 	 useNewUrlParser: true,
