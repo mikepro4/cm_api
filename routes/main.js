@@ -27,6 +27,10 @@ cloudinary.config({
 
 module.exports = app => {
 
+	app.post('/join', (req, res) => {
+		res.send({ link: uuidv4() });
+	});
+
 	app.post(
 		"/assign_avatar",
 		requireAuth,

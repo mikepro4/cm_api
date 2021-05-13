@@ -9,6 +9,7 @@ const tickerSchema = new Schema({
         name: String
     },
     active: { type: Boolean, default: true },
+    special: { type: Boolean, default: false },
     last24hours: { type: Number, default: 0 },
     last48hours: { type: Number, default: 0 },
     thisWeek: { type: Number, default: 0 },

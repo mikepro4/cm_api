@@ -10,6 +10,8 @@ const PUBLIC_DIR = "public";
 const STATIC_DIR = "static";
 const timeout = require('connect-timeout')
 
+const { v4: uuidv4 } = require('uuid');
+
 mongoose.Promise = global.Promise;
 const options = {
 	 useNewUrlParser: true,
@@ -40,6 +42,7 @@ app.use(express.static(PUBLIC_DIR));
 
 const Authentication = require('./controllers/authentication');
 const passportService = require('./services/passport');
+const { isObjectLike } = require("lodash");
 
 const requireAuth = passport.authenticate('jwt', { session: false });
 const requireSignin = passport.authenticate('local', { session: false });
@@ -99,9 +102,32 @@ const io = require('socket.io')(server, {
 })
 
 io.on('connection',(socket)=>{
-    socket.emit('rejectvideo',(data)=>{     
-        return('reject from socket')
+    socket.emit('hello',(data)=>{     
+        return('hello')
     })
+
+    socket.on('join-room', (userData) => {
+        const { roomID, userID } = userData;
+        console.log(userData)
+        console.log("join room")
+        io.emit('new-user-connect', userData);
+        
+        socket.on('disconnect', () => {
+            io.emit('user-disconnected', userID);
+        });
+        socket.on('broadcast-message', (message) => {
+            io.emit('new-broadcast-messsage', {...message, userData});
+        });
+        socket.on('reconnect-user', () => {
+            io.emit('new-user-connect', userData);
+        });
+        socket.on('display-media', (value) => {
+            io.emit('display-media', {userID, value });
+        });
+        socket.on('user-video-off', (value) => {
+            io.emit('user-video-off', value);
+        });
+    });
 
 })
 

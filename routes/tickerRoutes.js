@@ -37,8 +37,8 @@ module.exports = app => {
 
 	app.post("/tickers/create", async (req, res) => {
 		const ticker = await new Ticker({
+			...req.body.ticker,
 			createdAt: new Date(),
-			metadata: req.body.metadata,
 		}).save();
 		res.json(ticker);
 	});
@@ -94,7 +94,7 @@ module.exports = app => {
 		const { symbol } = req.body;
 		Ticker.findOne(
 			{
-				"metadata.symbol": { $eq: symbol }
+				"metadata.symbol": { $eq: symbol.toUpperCase()},
 			},
 			async (err, result) => {
 				if (!_.isEmpty(result)) return res.status(500).send("Already exists");
@@ -121,9 +121,13 @@ const buildQuery = criteria => {
 			"metadata.name": {
 				$regex: new RegExp(criteria.name),
 				$options: "i"
-			}
+			},
 		});
 	}
+
+	_.assign(query, {
+		active: { $eq: true }
+	});
 
 	return query
 };
