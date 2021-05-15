@@ -59,6 +59,14 @@ module.exports = app => {
 			}
 		);
 	});
+
+    app.post("/public/videos/item", async (req, res) => {
+		Video.findOne({ "googleId": req.body.googleId }, async (err, video) => {
+			if (video) {
+				res.json(video);
+			}
+		});
+	});
 }
 
 const buildQuery = criteria => {
